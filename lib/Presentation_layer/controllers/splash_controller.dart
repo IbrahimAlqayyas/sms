@@ -15,7 +15,6 @@ class SplashController extends GetxController {
 
   @override
   void onInit() {
-    Get.put(SmsController());
     startNavigationTimer();
     super.onInit();
   }

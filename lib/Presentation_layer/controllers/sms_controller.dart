@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:sms/data_layer/services/sms_services.dart';
 import 'package:sms/utils/list_extensions.dart';
 import 'package:sms/utils/permission_handler.dart';
-import '../../data_layer/models/sms.dart';
 import '../../data_layer/services/fetch.dart';
 import '../../data_layer/services/filter.dart';
 
@@ -13,6 +12,8 @@ class SmsController extends GetxController {
   bool? isLoadingMessages;
   String? loadingErrorMessage;
   List<SmsMessage> smsMessageList = [];
+  Permission? permissionStatus;
+  bool? fetchFailed;
 
   _emitIsLoadingState(bool state) {
     isLoadingMessages = state;
@@ -20,14 +21,22 @@ class SmsController extends GetxController {
   }
 
   fetchSmsMessages({String? keyword}) async {
-    _emitIsLoadingState(true);
-    if (keyword == null || keyword.removeAllWhitespace == '') {
-      await _fetchAllMessages(smsService: Fetch());
-    } else {
-      await _fetchFilteredMessages(smsService: Filter(), keyword: keyword);
+    try {
+      if (keyword == null || keyword.removeAllWhitespace == '') {
+        await _fetchAllMessages(smsService: Fetch());
+      } else {
+        await _fetchFilteredMessages(smsService: Filter(), keyword: keyword);
+      }
+      log('/// SMS Messages Length:');
+      log(smsMessageList.length.toString());
+      _emitIsLoadingState(false);
+    } catch(e, stacktrace) {
+      fetchFailed = true;
+      log(e.toString());
+      log(stacktrace.toString());
+      _emitIsLoadingState(false);
+
     }
-    log(smsMessageList.length.toString());
-    _emitIsLoadingState(false);
   }
 
   _fetchAllMessages({required SmsService smsService}) async {
@@ -41,26 +50,28 @@ class SmsController extends GetxController {
   }
 
   _checkPermissionAndFetchMessages() async {
-    dynamic permissionStatus = await PermissionHandler.handleSmsPermission();
-    if (permissionStatus is bool) {
-      if (permissionStatus == true) {
-        fetchSmsMessages();
-      } else {
-        loadingErrorMessage =
-            'You denied to give the permission of reading the SMS messages permanently, re-activate form the settings';
-      }
-    } else if (permissionStatus is String) {
-      loadingErrorMessage =
-          'You denied to give the permission of reading the SMS messages permanently, re-activate form the settings';
+    bool permissionStatus = await PermissionHandler.handleSmsPermission();
+    if (permissionStatus == true) {
+      this.permissionStatus = Permission.granted;
+      fetchSmsMessages();
     } else {
-      loadingErrorMessage = 'Loading Error!';
+      this.permissionStatus = Permission.denied;
+      loadingErrorMessage =
+      'You denied the permission of reading the SMS messages.\nRe-activate form the settings';
+      _emitIsLoadingState(false);
     }
-    log('/// Sms Permission Status: $permissionStatus');
   }
 
   @override
   void onInit() {
+    fetchFailed = false;
+    _emitIsLoadingState(true);
     _checkPermissionAndFetchMessages();
     super.onInit();
   }
+}
+
+enum Permission {
+  granted,
+  denied,
 }
