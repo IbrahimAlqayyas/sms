@@ -46,7 +46,8 @@ class SmsController extends GetxController {
       if (permissionStatus == true) {
         fetchSmsMessages();
       } else {
-        loadingErrorMessage = 'Permission Error!';
+        loadingErrorMessage =
+            'You denied to give the permission of reading the SMS messages permanently, re-activate form the settings';
       }
     } else if (permissionStatus is String) {
       loadingErrorMessage =
