@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import 'package:sms/theme/theme_constants.dart';
 import '../widgets/app_bar_widget.dart';
@@ -20,7 +21,7 @@ class SmsView extends StatelessWidget {
         appBar: const AppBarWidget(),
         bottomNavigationBar: const VersionStripWidget(),
         body: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(0),
           child: GetBuilder<SmsController>(
               init: SmsController(),
               builder: (controller) {
@@ -85,6 +86,7 @@ class SmsView extends StatelessWidget {
                         ),
                       );
                     }
+
                     /// 04- Permission granted but no data state
                     else if (controller.smsMessageList.isEmpty) {
                       return Center(
@@ -114,23 +116,123 @@ class SmsView extends StatelessWidget {
                         ),
                       );
                     }
+
                     /// 05- Permission granted & have data state
                     else if (controller.smsMessageList.isNotEmpty) {
                       return Column(
                         children: [
-                          // /// Search field
-                          // TextFormField(
-                          //   controller: searchFieldController,
-                          //   decoration: const InputDecoration(
-                          //     suffixIcon: Icon(Icons.search),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            decoration: const BoxDecoration(
+                              color: kBackgroundColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: kShadowColor,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    /// Search field
+                                    Container(
+                                      height: 50,
+                                      width: Get.width - 100,
+                                      decoration: BoxDecoration(
+                                        // color: kBackgroundColor,
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: kShadowColor,
+                                          ),
+                                          BoxShadow(
+                                            color: kBackgroundColor,
+                                            spreadRadius: -6.0,
+                                            blurRadius: 6.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: TextFormField(
+                                        controller: searchFieldController,
+                                        cursorColor: kPrimaryColor,
+                                        cursorHeight: 20,
+                                        textAlign: TextAlign.start,
+                                        maxLines: 1,
+                                        style: const TextStyle(color: kPrimaryColor),
+                                        decoration: const InputDecoration(
+                                          hintText: 'Search ..',
+                                          hintStyle: TextStyle(
+                                            color: kGreyColor,
+                                            height: 0.75,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: kPrimaryColor,
+                                              width: 1,
+                                            ),
+                                            borderRadius: BorderRadius.all(Radius.circular(14)),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: kPrimaryColor,
+                                              width: 1,
+                                            ),
+                                            borderRadius: BorderRadius.all(Radius.circular(14)),
+                                          ),
+                                          suffixIcon: Icon(
+                                            Icons.search,
+                                            color: kPrimaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    Container(
+                                      height: 50, width: 50,
+                                      decoration: BoxDecoration(
+                                        color: kPrimaryColor,
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(
+                                          color: kPrimaryColor,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                          Icons.tune,
+                                          color: kBackgroundColor,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                /// Checkboxes
+                                ///
+                                ///
+                              ],
+                            ),
+                          ),
+
+                          /// SMS messages list
+                          // Padding(
+                          //   padding: const EdgeInsets.all(16),
+                          //   child: ListView.builder(
+                          //     itemCount: controller.smsMessageList.length,
+                          //     itemBuilder: (context, index) {
+                          //       SmsMessage item = controller.smsMessageList[index];
+                          //       return Container();
+                          //     },
                           //   ),
                           // ),
-                          //
-                          // /// Checkboxes
-                          //
-                          //
-                          // /// SMS messages list
-                          // ListView.builder(),
                         ],
                       );
                     }

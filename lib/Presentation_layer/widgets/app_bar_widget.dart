@@ -13,9 +13,9 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: kBackgroundColor,
-      // shadowColor: Colors.transparent,
+      shadowColor: Colors.transparent,
       title: SizedBox(
-        width: 75,
+        width: 80,
         child: Image.asset('assets/logo/logo.png'),
       ),
     );
