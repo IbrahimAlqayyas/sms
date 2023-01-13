@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sms/theme/theme_constants.dart';
-import 'Presentation_layer/views/splash_view.dart';
+import 'views/splash_view.dart';
 import 'package:get/get.dart';
 
 class SmsApp extends StatelessWidget {
