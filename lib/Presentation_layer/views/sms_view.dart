@@ -356,7 +356,6 @@ class SmsView extends StatelessWidget {
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
-
                                                 ],
                                               ),
                                               trailing: Column(

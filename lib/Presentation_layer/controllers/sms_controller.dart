@@ -80,7 +80,8 @@ class SmsController extends GetxController {
     isExpanded = [];
 
     for (var item in smsMessageList) {
-      if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
+      if (item.body!.toLowerCase().contains(keyword.toLowerCase()) ||
+          item.sender!.toLowerCase().contains(keyword.toLowerCase())) {
         smsMessageListToShow.add(item);
         isExpanded.add(true);
       }
