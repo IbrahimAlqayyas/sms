@@ -4,6 +4,7 @@ import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import 'package:sms/theme/theme_constants.dart';
 import 'package:sms/utils/date_time_parse.dart';
 import 'package:sms/utils/number_formatting_extension.dart';
+import 'package:sms/utils/string_utils.dart';
 import '../../data_layer/models/sms.dart';
 import '../widgets/app_bar_widget.dart';
 import '../widgets/loading_indicator.dart';
@@ -186,7 +187,7 @@ class SmsView extends StatelessWidget {
                                               controller.clearFilter();
                                             }
                                           },
-                                          controller: controller.searchFieldController,
+                                          controller: controller.searchKeywordController,
                                           cursorColor: kPrimaryColor,
                                           cursorHeight: 20,
                                           textAlign: TextAlign.start,
@@ -213,7 +214,7 @@ class SmsView extends StatelessWidget {
                                               ),
                                               borderRadius: BorderRadius.all(Radius.circular(14)),
                                             ),
-                                            suffixIcon: controller.searchFieldController.text.isNotEmpty
+                                            suffixIcon: controller.searchKeywordController.text.isNotEmpty
                                                 ? InkWell(
                                                     onTap: () {
                                                       controller.clearFilter();
@@ -389,14 +390,45 @@ class SmsView extends StatelessWidget {
                                                       bottomRight: Radius.circular(10),
                                                     ),
                                                   ),
-                                                  child: Text(
-                                                    item.body!,
-                                                    textAlign: TextAlign.start,
-                                                    style: TextStyle(
-                                                      fontSize: kBodyFontSize,
-                                                      color: textColor,
-                                                    ),
-                                                  ),
+                                                  child: controller.searchKeywordController.text
+                                                          .removeAllWhitespace.isEmpty
+                                                      ? Text(
+                                                          item.body!,
+                                                          textAlign: TextAlign.start,
+                                                          style: const TextStyle(
+                                                            fontSize: kBodyFontSize,
+                                                            color: kWhiteColor,
+                                                          ),
+                                                        )
+                                                      : RichText(
+                                                          text: TextSpan(
+                                                            children: List.generate(
+                                                                controller.getTextSpanLength(item,
+                                                                    controller.searchKeywordController.text),
+                                                                (index) {
+                                                              String text = controller.getBodyText(
+                                                                  item,
+                                                                  controller
+                                                                      .searchKeywordController.text)[index];
+                                                              return TextSpan(
+                                                                text: text,
+                                                                style: TextStyle(
+                                                                  fontSize: kBodyFontSize,
+                                                                  color: text ==
+                                                                          controller
+                                                                              .searchKeywordController.text
+                                                                      ? kPrimaryColor
+                                                                      : kWhiteColor,
+                                                                  decoration: text ==
+                                                                          controller
+                                                                              .searchKeywordController.text
+                                                                      ? TextDecoration.underline
+                                                                      : null,
+                                                                ),
+                                                              );
+                                                            }).toList(),
+                                                          ),
+                                                        ),
                                                 ),
                                               ],
                                             ),

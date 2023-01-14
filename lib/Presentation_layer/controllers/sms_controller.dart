@@ -6,6 +6,7 @@ import 'package:sms/data_layer/services/sms_services.dart';
 import 'package:sms/utils/list_extensions.dart';
 import 'package:sms/utils/number_formatting_extension.dart';
 import 'package:sms/utils/permission_handler.dart';
+import 'package:sms/utils/string_utils.dart';
 import '../../data_layer/models/sms.dart';
 import '../../data_layer/services/fetch.dart';
 import '../../data_layer/services/filter.dart';
@@ -19,7 +20,7 @@ class SmsController extends GetxController {
   Permission? permissionStatus;
   bool? fetchFailed;
   int monthCount = 0;
-  TextEditingController searchFieldController = TextEditingController();
+  TextEditingController searchKeywordController = TextEditingController();
   UniqueKey? expansionTileReRenderKey;
 
   /// to refresh the expansion tile for new expansion states
@@ -93,12 +94,20 @@ class SmsController extends GetxController {
   clearFilter() {
     smsMessageListToShow = smsMessageList;
     isExpanded = [];
-    searchFieldController.clear();
+    searchKeywordController.clear();
     for (var item in smsMessageList) {
       isExpanded.add(false);
     }
     update();
     _expansionTileReRender();
+  }
+
+  getTextSpanLength(Sms item, String keyword) {
+    return StringUtils.returnSplitLength(str: item.body!, keyword: keyword);
+  }
+
+  List<String> getBodyText(Sms item, String keyword) {
+    return StringUtils.split(str: item.body!, keyword: keyword);
   }
 
   fetchSmsMessages({String? keyword}) async {
@@ -118,7 +127,7 @@ class SmsController extends GetxController {
 
       smsMessageList = [
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Configuration AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
+            {'body': 'nnConfiguration nn AED 2,563.05 ;jnndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
             {'body': 'Innovation AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
@@ -132,7 +141,7 @@ class SmsController extends GetxController {
         Sms.fromSmsMessage(SmsMessage.fromJson(
             {'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Clarification AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
+            {'body': 'Clarification AED 63.05 ;jndfgnn', 'address': 'Ahmed', 'date': 1642118621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
             {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ahmed', 'date': 1636848221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
@@ -166,7 +175,6 @@ class SmsController extends GetxController {
         if (isFirstItem || isNotFirstItem && isSameYear && isDifferentMonths || isDifferentYears) {
           addToMonthCount();
         }
-        log('/// For Loop ${i + 1}');
       }
       _emitIsLoadingState(false);
     } catch (e, stacktrace) {
