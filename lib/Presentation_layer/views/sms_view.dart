@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import 'package:sms/theme/theme_constants.dart';
+import 'package:sms/utils/date_time_parse.dart';
+import 'package:sms/utils/number_formatting_extension.dart';
+import '../../data_layer/models/sms.dart';
 import '../widgets/app_bar_widget.dart';
 import '../widgets/loading_indicator.dart';
 import '../widgets/version_strip.dart';
 import 'package:get/get.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SmsView extends StatelessWidget {
   const SmsView({Key? key}) : super(key: key);
@@ -14,7 +16,6 @@ class SmsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController searchFieldController = TextEditingController();
-
     return Material(
       child: Scaffold(
         backgroundColor: kBackgroundColor,
@@ -136,14 +137,13 @@ class SmsView extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     /// Search field
                                     Container(
                                       height: 50,
-                                      width: Get.width - 100,
+                                      width: Get.width - 90,
                                       decoration: BoxDecoration(
                                         // color: kBackgroundColor,
                                         borderRadius: BorderRadius.circular(14),
@@ -193,8 +193,10 @@ class SmsView extends StatelessWidget {
                                       ),
                                     ),
 
+                                    /// Filter button
                                     Container(
-                                      height: 50, width: 50,
+                                      height: 50,
+                                      width: 50,
                                       decoration: BoxDecoration(
                                         color: kPrimaryColor,
                                         borderRadius: BorderRadius.circular(14),
@@ -223,16 +225,150 @@ class SmsView extends StatelessWidget {
                           ),
 
                           /// SMS messages list
-                          // Padding(
-                          //   padding: const EdgeInsets.all(16),
-                          //   child: ListView.builder(
-                          //     itemCount: controller.smsMessageList.length,
-                          //     itemBuilder: (context, index) {
-                          //       SmsMessage item = controller.smsMessageList[index];
-                          //       return Container();
-                          //     },
-                          //   ),
-                          // ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Container(
+                              height: Get.height - 310,
+                              decoration: const BoxDecoration(
+                                color: kBackgroundColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: kShadowColor,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.builder(
+                                itemCount: controller.smsMessageList.length,
+                                physics: const BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  Sms item = controller.smsMessageList[index];
+                                  bool isExpanded = controller.isExpanded[index];
+                                  // Color color = (colorSwatch..shuffle()).first;
+                                  // Color color = kPrimaryColor;
+                                  Color backColor = kBackgroundColor;
+                                  Color textColor = kPrimaryColor;
+                                  return Container(
+                                    // height: 75,
+                                    margin: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
+                                    decoration: BoxDecoration(
+                                      color: backColor,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: kPrimaryColor,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(13),
+                                      child: ExpansionTile(
+                                        textColor: textColor,
+                                        backgroundColor: kPrimaryColor,
+                                        onExpansionChanged: (state) {
+                                          controller.changeIsExpandedState(state, index);
+                                        },
+                                        title: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.sender!,
+                                              style: TextStyle(
+                                                fontSize: bodyFontSize,
+                                                color: isExpanded ? kBackgroundColor : textColor,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${item.amount!.formatThousands()} AED',
+                                              style: TextStyle(
+                                                fontSize: bodyFontSize,
+                                                color: isExpanded ? kBackgroundColor : textColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              DateTimeParse.parseDateTimeReturnDateString(
+                                                item.date.toString(),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: bodyFontSize,
+                                                color: isExpanded ? kBackgroundColor : textColor,
+                                              ),
+                                            ),
+                                            Icon(
+                                              controller.isExpanded[index]
+                                                  ? Icons.keyboard_arrow_up
+                                                  : Icons.keyboard_arrow_down,
+                                              color: isExpanded ? kBackgroundColor : textColor,
+                                            ),
+                                          ],
+                                        ),
+                                        children: [
+                                          Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: const BoxDecoration(
+                                              color: kBackgroundColor,
+                                              borderRadius: BorderRadius.only(
+                                                bottomLeft: Radius.circular(10),
+                                                bottomRight: Radius.circular(10),
+                                              ),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.body!,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: bodyFontSize,
+                                                    color: textColor,
+                                                  ),
+                                                ),
+
+
+
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
+                          /// Totalling
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                const Text('Total', style: TextStyle(
+                                  fontSize: bodyFontSize,
+                                  color: kPrimaryColor,
+                                ),),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('${controller.getTotalAmount()} AED', style: const TextStyle(
+                                      fontSize: bodyFontSize,
+                                      color: kPrimaryColor,
+                                    ),),
+                                    // Text(controller.getTotalMonths(), style: TextStyle(
+                                    //   fontSize: bodyFontSize,
+                                    //   color: kPrimaryColor,
+                                    // ),),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       );
                     }
