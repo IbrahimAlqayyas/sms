@@ -88,7 +88,7 @@ class SmsView extends StatelessWidget {
                     }
 
                     /// 04- Permission granted but no data state
-                    else if (controller.smsMessageListToShow.isEmpty) {
+                    else if (controller.smsMessageListToShow.isEmpty && controller.smsMessageList.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -118,7 +118,7 @@ class SmsView extends StatelessWidget {
                     }
 
                     /// 05- Permission granted & have data state
-                    else if (controller.smsMessageListToShow.isNotEmpty) {
+                    else if (controller.smsMessageList.isNotEmpty) {
                       return SingleChildScrollView(
                         physics: const NeverScrollableScrollPhysics(),
                         child: Column(
@@ -270,6 +270,8 @@ class SmsView extends StatelessWidget {
                                               ),
                                             ),
                                           ),
+
+                                        /// SMS item
                                         Container(
                                           margin: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
                                           decoration: BoxDecoration(
@@ -295,13 +297,17 @@ class SmsView extends StatelessWidget {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(13),
                                             child: ExpansionTile(
+                                              collapsedBackgroundColor: kBackgroundColor,
+                                              collapsedIconColor: kPrimaryColor,
+                                              collapsedTextColor: kPrimaryColor,
                                               textColor: textColor,
                                               backgroundColor: kPrimaryColor,
-                                              // initiallyExpanded: controller.isExpanded[index],
-                                              initiallyExpanded: true,
+                                              initiallyExpanded: controller.isExpanded[index],
+                                              // initiallyExpanded: true,
                                               onExpansionChanged: (state) {
                                                 controller.changeIsExpandedState(state, index);
                                               },
+                                              maintainState: true,
                                               title: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -443,7 +449,11 @@ class SmsView extends StatelessWidget {
                     }
                   }
                 }
-                return Container();
+                return const Center(
+                  child: Text('[DEV]: un-managed state', style: TextStyle(
+                    color: kWhiteColor,
+                  ),)
+                );
               }),
         ),
       ),

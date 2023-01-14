@@ -33,8 +33,8 @@ class SmsController extends GetxController {
 
   String getTotalAmount() {
     double amount = 0.0;
-    for (int i = 0; i < smsMessageList.length; i++) {
-      amount += smsMessageList[i].amount!.toDouble();
+    for (int i = 0; i < smsMessageListToShow.length; i++) {
+      amount += smsMessageListToShow[i].amount!.toDouble();
     }
 
     return amount.formatThousands();
@@ -54,18 +54,24 @@ class SmsController extends GetxController {
   filter(String keyword) {
     smsMessageListToShow = [];
     isExpanded = [];
-    for (var item in smsMessageList) {
-      if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
-        smsMessageListToShow.add(item);
-        isExpanded.add(true);
-      }
-    }
+
+    smsMessageList.forEach((element) {
+      if (element.body!.toLowerCase().contains(keyword.toLowerCase())) smsMessageListToShow.add(element);
+      isExpanded.add(false);
+    });
+    // for (var item in smsMessageList) {
+    //   if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
+    //     smsMessageListToShow.add(item);
+    //     isExpanded.add(true);
+    //   }
+    // }
     log('/// SmsFilteredMessageList Length:');
     log(smsMessageListToShow.length.toString());
-    for( var item in smsMessageListToShow) {
-      log(item.body.toString());
-    }
     update();
+    // _delayedUpdate(milliseconds: 1000);
+  }
+  _delayedUpdate({required milliseconds}) {
+    Future.delayed(Duration(milliseconds: milliseconds) , () => update());
   }
 
   clearFilter() {
