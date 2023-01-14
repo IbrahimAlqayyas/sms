@@ -18,7 +18,24 @@ class SmsView extends StatelessWidget {
     return Material(
       child: Scaffold(
         backgroundColor: kBackgroundColor,
-        appBar: const AppBarWidget(),
+        appBar: AppBarWidget(actions: [
+
+          IconButton(
+            onPressed: () {
+              Get.find<SmsController>().collapseAllMessages();
+
+            },
+            icon: const Icon(Icons.unfold_less, color: kPrimaryColor,),
+          ),
+            IconButton(
+              onPressed: () {
+                Get.find<SmsController>().expandAllMessages();
+              },
+              icon: const Icon(Icons.unfold_more, color: kPrimaryColor,),
+            ),
+
+
+        ]),
         bottomNavigationBar: const VersionStripWidget(),
         body: Padding(
           padding: const EdgeInsets.all(0),
@@ -174,6 +191,7 @@ class SmsView extends StatelessWidget {
                                           maxLines: 1,
                                           style: const TextStyle(color: kPrimaryColor),
                                           decoration: const InputDecoration(
+                                            fillColor: kBackgroundLighterColor,
                                             hintText: 'Search ..',
                                             hintStyle: TextStyle(
                                               color: kGreyColor,
@@ -241,16 +259,13 @@ class SmsView extends StatelessWidget {
                                   color: kBackgroundColor,
                                 ),
                                 child: ListView.builder(
+                                  shrinkWrap: true,
                                   itemCount: controller.smsMessageListToShow.length,
                                   physics: const BouncingScrollPhysics(),
                                   itemBuilder: (context, index) {
-                                    List<Sms> listToShow = controller.smsMessageListToShow;
-                                    Sms item = listToShow[index];
-                                    Sms prevItem = index > 0 ? listToShow[index - 1] : item;
-                                    bool isExpanded = controller.isExpanded[index];
-                                    // Color color = (colorSwatch..shuffle()).first;
-                                    // Color color = kPrimaryColor;
-                                    Color backColor = kBackgroundColor;
+                                    Sms item = controller.smsMessageListToShow[index];
+                                    Sms prevItem = index > 0 ? controller.smsMessageListToShow[index - 1] : item;
+                                    Color backColor = kBackgroundLighterColor;
                                     Color textColor = kPrimaryColor;
 
                                     return Column(
@@ -261,7 +276,7 @@ class SmsView extends StatelessWidget {
                                             padding: const EdgeInsets.symmetric(vertical: 8),
                                             child: Text(
                                               DateTimeParse.parseDateTimeReturnMonthString(
-                                                      item.date.toString())
+                                                  item.date.toString())
                                                   .toString()
                                                   .toUpperCase(),
                                               style: const TextStyle(
@@ -282,8 +297,8 @@ class SmsView extends StatelessWidget {
                                             //   bottomRight: Radius.circular(14),
                                             // ),
                                             border: Border.all(
-                                              color: kPrimaryColor,
-                                              width: 1,
+                                              color: controller.isExpanded[index] ? kPrimaryColor : kPrimaryColor.withOpacity(0.25),
+                                              width: controller.isExpanded[index] ? 1 : 1,
                                             ),
                                             boxShadow: const [
                                               BoxShadow(
@@ -297,17 +312,17 @@ class SmsView extends StatelessWidget {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(13),
                                             child: ExpansionTile(
-                                              collapsedBackgroundColor: kBackgroundColor,
+                                              key: controller.expansionTileReRenderKey,
+                                              collapsedBackgroundColor: backColor,
                                               collapsedIconColor: kPrimaryColor,
                                               collapsedTextColor: kPrimaryColor,
                                               textColor: textColor,
-                                              backgroundColor: kPrimaryColor,
+                                              backgroundColor: backColor,
                                               initiallyExpanded: controller.isExpanded[index],
-                                              // initiallyExpanded: true,
                                               onExpansionChanged: (state) {
                                                 controller.changeIsExpandedState(state, index);
                                               },
-                                              maintainState: true,
+                                              // maintainState: false,
                                               title: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -315,38 +330,33 @@ class SmsView extends StatelessWidget {
                                                     item.sender!,
                                                     style: TextStyle(
                                                       fontSize: kBodyFontSize,
-                                                      color: isExpanded ? kBackgroundColor : textColor,
+                                                      color: textColor,
                                                     ),
                                                   ),
                                                   Text(
                                                     '${item.amount!.formatThousands()} AED',
                                                     style: TextStyle(
                                                       fontSize: kBodyFontSize,
-                                                      color: isExpanded ? kBackgroundColor : textColor,
+                                                      color: textColor,
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                              trailing: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
                                                   Text(
                                                     DateTimeParse.parseDateTimeReturnDateString(
                                                       item.date.toString(),
                                                     ),
                                                     style: TextStyle(
                                                       fontSize: kBodyFontSize,
-                                                      color: isExpanded ? kBackgroundColor : textColor,
+                                                      color: textColor,
                                                     ),
                                                   ),
-                                                  Icon(
-                                                    controller.isExpanded[index]
-                                                        ? Icons.keyboard_arrow_up
-                                                        : Icons.keyboard_arrow_down,
-                                                    color: isExpanded ? kBackgroundColor : textColor,
-                                                  ),
                                                 ],
+                                              ),
+                                              trailing: Icon(
+                                                controller.isExpanded[index]
+                                                    ? Icons.keyboard_arrow_up
+                                                    : Icons.keyboard_arrow_down,
+                                                color: textColor,
                                               ),
                                               children: [
                                                 Container(
@@ -359,18 +369,13 @@ class SmsView extends StatelessWidget {
                                                       bottomRight: Radius.circular(10),
                                                     ),
                                                   ),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        item.body!,
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: kBodyFontSize,
-                                                          color: textColor,
-                                                        ),
-                                                      ),
-                                                    ],
+                                                  child: Text(
+                                                    item.body!,
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      fontSize: kBodyFontSize,
+                                                      color: textColor,
+                                                    ),
                                                   ),
                                                 ),
                                               ],

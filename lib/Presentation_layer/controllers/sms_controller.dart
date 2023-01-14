@@ -20,6 +20,13 @@ class SmsController extends GetxController {
   bool? fetchFailed;
   int monthCount = 0;
   TextEditingController searchFieldController = TextEditingController();
+  UniqueKey? expansionTileReRenderKey;
+
+  /// to refresh the expansion tile for new expansion states
+  void _expansionTileReRender() {
+    expansionTileReRenderKey = UniqueKey();
+    update();
+  }
 
   _emitIsLoadingState(bool state) {
     isLoadingMessages = state;
@@ -28,6 +35,23 @@ class SmsController extends GetxController {
 
   changeIsExpandedState(bool state, index) {
     isExpanded[index] = state;
+    update();
+  }
+
+  expandAllMessages() {
+    isExpanded = [];
+    for (var item in smsMessageListToShow) {
+      isExpanded.add(true);
+    }
+    _expansionTileReRender();
+  }
+
+  collapseAllMessages() {
+    isExpanded = [];
+    for (var item in smsMessageListToShow) {
+      isExpanded.add(false);
+    }
+    _expansionTileReRender();
     update();
   }
 
@@ -55,23 +79,14 @@ class SmsController extends GetxController {
     smsMessageListToShow = [];
     isExpanded = [];
 
-    smsMessageList.forEach((element) {
-      if (element.body!.toLowerCase().contains(keyword.toLowerCase())) smsMessageListToShow.add(element);
-      isExpanded.add(false);
-    });
-    // for (var item in smsMessageList) {
-    //   if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
-    //     smsMessageListToShow.add(item);
-    //     isExpanded.add(true);
-    //   }
-    // }
-    log('/// SmsFilteredMessageList Length:');
-    log(smsMessageListToShow.length.toString());
+    for (var item in smsMessageList) {
+      if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
+        smsMessageListToShow.add(item);
+        isExpanded.add(true);
+      }
+    }
     update();
-    // _delayedUpdate(milliseconds: 1000);
-  }
-  _delayedUpdate({required milliseconds}) {
-    Future.delayed(Duration(milliseconds: milliseconds) , () => update());
+    _expansionTileReRender();
   }
 
   clearFilter() {
@@ -129,8 +144,6 @@ class SmsController extends GetxController {
       ];
 
       smsMessageListToShow = smsMessageList;
-      log('/// SMS Messages Length:');
-      log(smsMessageList.length.toString());
       for (int i = 0; i < smsMessageList.length; i++) {
         isExpanded.add(false);
         if (i == 0 || i > 0 && smsMessageList[i].date?.month != smsMessageList[i - 1].date?.month) {
