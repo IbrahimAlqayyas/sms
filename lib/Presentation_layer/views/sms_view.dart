@@ -19,22 +19,24 @@ class SmsView extends StatelessWidget {
       child: Scaffold(
         backgroundColor: kBackgroundColor,
         appBar: AppBarWidget(actions: [
-
           IconButton(
             onPressed: () {
               Get.find<SmsController>().collapseAllMessages();
-
             },
-            icon: const Icon(Icons.unfold_less, color: kPrimaryColor,),
-          ),
-            IconButton(
-              onPressed: () {
-                Get.find<SmsController>().expandAllMessages();
-              },
-              icon: const Icon(Icons.unfold_more, color: kPrimaryColor,),
+            icon: const Icon(
+              Icons.unfold_less,
+              color: kPrimaryColor,
             ),
-
-
+          ),
+          IconButton(
+            onPressed: () {
+              Get.find<SmsController>().expandAllMessages();
+            },
+            icon: const Icon(
+              Icons.unfold_more,
+              color: kPrimaryColor,
+            ),
+          ),
         ]),
         bottomNavigationBar: const VersionStripWidget(),
         body: Padding(
@@ -190,31 +192,41 @@ class SmsView extends StatelessWidget {
                                           textAlign: TextAlign.start,
                                           maxLines: 1,
                                           style: const TextStyle(color: kPrimaryColor),
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             fillColor: kBackgroundLighterColor,
                                             hintText: 'Search ..',
-                                            hintStyle: TextStyle(
+                                            hintStyle: const TextStyle(
                                               color: kGreyColor,
                                               height: 0.75,
                                             ),
-                                            focusedBorder: OutlineInputBorder(
+                                            focusedBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                 color: kPrimaryColor,
                                                 width: 1,
                                               ),
                                               borderRadius: BorderRadius.all(Radius.circular(14)),
                                             ),
-                                            enabledBorder: OutlineInputBorder(
+                                            enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                 color: kPrimaryColor,
                                                 width: 1,
                                               ),
                                               borderRadius: BorderRadius.all(Radius.circular(14)),
                                             ),
-                                            suffixIcon: Icon(
-                                              Icons.search,
-                                              color: kPrimaryColor,
-                                            ),
+                                            suffixIcon: controller.searchFieldController.text.isNotEmpty
+                                                ? InkWell(
+                                                    onTap: () {
+                                                      controller.clearFilter();
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.clear,
+                                                      color: kPrimaryColor,
+                                                    ),
+                                                  )
+                                                : const Icon(
+                                                    Icons.search,
+                                                    color: kPrimaryColor,
+                                                  ),
                                           ),
                                         ),
                                       ),
@@ -264,7 +276,8 @@ class SmsView extends StatelessWidget {
                                   physics: const BouncingScrollPhysics(),
                                   itemBuilder: (context, index) {
                                     Sms item = controller.smsMessageListToShow[index];
-                                    Sms prevItem = index > 0 ? controller.smsMessageListToShow[index - 1] : item;
+                                    Sms prevItem =
+                                        index > 0 ? controller.smsMessageListToShow[index - 1] : item;
                                     Color backColor = kBackgroundLighterColor;
                                     Color textColor = kPrimaryColor;
 
@@ -276,7 +289,7 @@ class SmsView extends StatelessWidget {
                                             padding: const EdgeInsets.symmetric(vertical: 8),
                                             child: Text(
                                               DateTimeParse.parseDateTimeReturnMonthString(
-                                                  item.date.toString())
+                                                      item.date.toString())
                                                   .toString()
                                                   .toUpperCase(),
                                               style: const TextStyle(
@@ -297,7 +310,9 @@ class SmsView extends StatelessWidget {
                                             //   bottomRight: Radius.circular(14),
                                             // ),
                                             border: Border.all(
-                                              color: controller.isExpanded[index] ? kPrimaryColor : kPrimaryColor.withOpacity(0.25),
+                                              color: controller.isExpanded[index]
+                                                  ? kPrimaryColor
+                                                  : kPrimaryColor.withOpacity(0.25),
                                               width: controller.isExpanded[index] ? 1 : 1,
                                             ),
                                             boxShadow: const [
@@ -341,6 +356,12 @@ class SmsView extends StatelessWidget {
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
+
+                                                ],
+                                              ),
+                                              trailing: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
                                                   Text(
                                                     DateTimeParse.parseDateTimeReturnDateString(
                                                       item.date.toString(),
@@ -350,13 +371,13 @@ class SmsView extends StatelessWidget {
                                                       color: textColor,
                                                     ),
                                                   ),
+                                                  Icon(
+                                                    controller.isExpanded[index]
+                                                        ? Icons.keyboard_arrow_up
+                                                        : Icons.keyboard_arrow_down,
+                                                    color: textColor,
+                                                  ),
                                                 ],
-                                              ),
-                                              trailing: Icon(
-                                                controller.isExpanded[index]
-                                                    ? Icons.keyboard_arrow_up
-                                                    : Icons.keyboard_arrow_down,
-                                                color: textColor,
                                               ),
                                               children: [
                                                 Container(
@@ -455,10 +476,12 @@ class SmsView extends StatelessWidget {
                   }
                 }
                 return const Center(
-                  child: Text('[DEV]: un-managed state', style: TextStyle(
+                    child: Text(
+                  '[DEV]: un-managed state',
+                  style: TextStyle(
                     color: kWhiteColor,
-                  ),)
-                );
+                  ),
+                ));
               }),
         ),
       ),

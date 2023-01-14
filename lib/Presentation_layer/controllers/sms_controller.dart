@@ -91,10 +91,13 @@ class SmsController extends GetxController {
 
   clearFilter() {
     smsMessageListToShow = smsMessageList;
+    isExpanded = [];
+    searchFieldController.clear();
     for (var item in smsMessageList) {
       isExpanded.add(false);
     }
     update();
+    _expansionTileReRender();
   }
 
   fetchSmsMessages({String? keyword}) async {
@@ -103,12 +106,14 @@ class SmsController extends GetxController {
       smsMessageList = [];
       isExpanded = [];
       fetchFailed = false;
-      // TODO: re-activate the conditions
-      // if (keyword == null || keyword.removeAllWhitespace == '') {
-      //   await _fetchAllMessages(smsService: Fetch());
-      // } else {
+      if (keyword == null || keyword.removeAllWhitespace == '') {
+        await _fetchAllMessages(smsService: Fetch());
+      }
+      // else {
       //   await _fetchFilteredMessages(smsService: Filter(), keyword: keyword);
       // }
+
+      // TODO: remove this declaration
 
       smsMessageList = [
         Sms.fromSmsMessage(SmsMessage.fromJson(
@@ -116,31 +121,31 @@ class SmsController extends GetxController {
         Sms.fromSmsMessage(SmsMessage.fromJson(
             {'body': 'Innovation AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Innovation AED 2574.05 ;jndfg', 'address': 'Ibrahim', 'date': 1652486621000})),
+            {'body': 'Innovation 2574.05 ;jndfg', 'address': 'Ibrahim', 'date': 1652486621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Ibrahim', 'date': 1652486621000})),
+            {'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Mohamed', 'date': 1652486621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Ibrahim', 'date': 1647216221000})),
+            {'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Mohamed', 'date': 1647216221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Configuration AED 2,000.0 ;jndfg', 'address': 'Ibrahim', 'date': 1647216221000})),
+            {'body': 'Configuration 2,000.0 ;jndfg', 'address': 'Mohamed', 'date': 1647216221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ibrahim', 'date': 1642118621000})),
+            {'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Clarification AED 63.05 ;jndfg', 'address': 'Ibrahim', 'date': 1642118621000})),
+            {'body': 'Clarification AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ahmed', 'date': 1636848221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ahmed', 'date': 1636848221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
-        Sms.fromSmsMessage(
-            SmsMessage.fromJson({'body': '63.05 AED ;Encapsulation', 'address': 'Ibrahim', 'date': 1636848221000})),
-        Sms.fromSmsMessage(
-            SmsMessage.fromJson({'body': 'AED 63.05 ;Encapsulation', 'address': 'Ibrahim', 'date': 1636848221000})),
-        Sms.fromSmsMessage(
-            SmsMessage.fromJson({'body': ';Encapsulation 63.05 AED', 'address': 'Ibrahim', 'date': 1636848221000})),
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Rovan', 'date': 1636848221000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': ';No hesitation AED 10000.05', 'address': 'Ibrahim', 'date': 1636848221000})),
+            {'body': '63.05 AED ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'AED 63.05 ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': ';Encapsulation 63.05 AED', 'address': 'Rovan', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': ';No hesitation AED 10000.05', 'address': 'Rovan', 'date': 1636848221000})),
       ];
 
       smsMessageListToShow = smsMessageList;
@@ -164,10 +169,10 @@ class SmsController extends GetxController {
     smsMessageList.convertIntoEmptyListIfNull<SmsMessage>();
   }
 
-  _fetchFilteredMessages({required SmsService smsService, String? keyword}) async {
-    smsMessageList = await smsService.fetchMessages(keyword: keyword);
-    smsMessageList.convertIntoEmptyListIfNull<SmsMessage>();
-  }
+  // _fetchFilteredMessages({required SmsService smsService, String? keyword}) async {
+  //   smsMessageList = await smsService.fetchMessages(keyword: keyword);
+  //   smsMessageList.convertIntoEmptyListIfNull<SmsMessage>();
+  // }
 
   _checkPermissionAndFetchMessages() async {
     bool permissionStatus = await PermissionHandler.handleSmsPermission();
