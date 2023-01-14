@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:get/get.dart';
 import 'package:sms/data_layer/services/sms_services.dart';
@@ -13,9 +14,12 @@ class SmsController extends GetxController {
   bool? isLoadingMessages;
   String? loadingErrorMessage;
   List<Sms> smsMessageList = [];
+  List<Sms> smsMessageListToShow = [];
   List<bool> isExpanded = [];
   Permission? permissionStatus;
   bool? fetchFailed;
+  int monthCount = 0;
+  TextEditingController searchFieldController = TextEditingController();
 
   _emitIsLoadingState(bool state) {
     isLoadingMessages = state;
@@ -29,16 +33,55 @@ class SmsController extends GetxController {
 
   String getTotalAmount() {
     double amount = 0.0;
-    for(int i = 0 ; i < smsMessageList.length ; i++) {
+    for (int i = 0; i < smsMessageList.length; i++) {
       amount += smsMessageList[i].amount!.toDouble();
     }
 
     return amount.formatThousands();
   }
 
+  addToMonthCount() {
+    monthCount += 1;
+  }
+
+  String getTotalMonths() {
+    if (monthCount == 1) {
+      return '$monthCount Month';
+    }
+    return '$monthCount Months';
+  }
+
+  filter(String keyword) {
+    smsMessageListToShow = [];
+    isExpanded = [];
+    for (var item in smsMessageList) {
+      if (item.body!.toLowerCase().contains(keyword.toLowerCase())) {
+        smsMessageListToShow.add(item);
+        isExpanded.add(true);
+      }
+    }
+    log('/// SmsFilteredMessageList Length:');
+    log(smsMessageListToShow.length.toString());
+    for( var item in smsMessageListToShow) {
+      log(item.body.toString());
+    }
+    update();
+  }
+
+  clearFilter() {
+    smsMessageListToShow = smsMessageList;
+    for (var item in smsMessageList) {
+      isExpanded.add(false);
+    }
+    update();
+  }
+
   fetchSmsMessages({String? keyword}) async {
     try {
-
+      monthCount = 0;
+      smsMessageList = [];
+      isExpanded = [];
+      fetchFailed = false;
       // TODO: re-activate the conditions
       // if (keyword == null || keyword.removeAllWhitespace == '') {
       //   await _fetchAllMessages(smsService: Fetch());
@@ -46,26 +89,50 @@ class SmsController extends GetxController {
       //   await _fetchFilteredMessages(smsService: Filter(), keyword: keyword);
       // }
 
-      // TODO: remove this declaration (only testing)
-    smsMessageList = [
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'ttego AED 2,563.05 ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'ttego AED 2574.05 ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'ttego AED 2,000.0 ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'ttego AED 63.05 ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'ttego AED 63.05 AED ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : '63.05 AED ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : 'AED 63.05 ;jndfg', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : ';jndfg 63.05 AED', 'address' : 'Ibrahim', 'date' : 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body' : ';jndfg AED 10000.05', 'address' : 'Ibrahim', 'date' : 1640979000000})),
+      smsMessageList = [
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Configuration AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Innovation AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Innovation AED 2574.05 ;jndfg', 'address': 'Ibrahim', 'date': 1652486621000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Ibrahim', 'date': 1652486621000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Ibrahim', 'date': 1647216221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Configuration AED 2,000.0 ;jndfg', 'address': 'Ibrahim', 'date': 1647216221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ibrahim', 'date': 1642118621000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Clarification AED 63.05 ;jndfg', 'address': 'Ibrahim', 'date': 1642118621000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(
+            SmsMessage.fromJson({'body': '63.05 AED ;Encapsulation', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(
+            SmsMessage.fromJson({'body': 'AED 63.05 ;Encapsulation', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(
+            SmsMessage.fromJson({'body': ';Encapsulation 63.05 AED', 'address': 'Ibrahim', 'date': 1636848221000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson(
+            {'body': ';No hesitation AED 10000.05', 'address': 'Ibrahim', 'date': 1636848221000})),
+      ];
 
-    ];
+      smsMessageListToShow = smsMessageList;
       log('/// SMS Messages Length:');
       log(smsMessageList.length.toString());
-      for (int i = 0 ; i < smsMessageList.length ; i++) {
+      for (int i = 0; i < smsMessageList.length; i++) {
         isExpanded.add(false);
+        if (i == 0 || i > 0 && smsMessageList[i].date?.month != smsMessageList[i - 1].date?.month) {
+          addToMonthCount();
+        }
       }
       _emitIsLoadingState(false);
-    } catch(e, stacktrace) {
+    } catch (e, stacktrace) {
       fetchFailed = true;
       log(e.toString());
       log(stacktrace.toString());
@@ -91,7 +158,7 @@ class SmsController extends GetxController {
     } else {
       this.permissionStatus = Permission.denied;
       loadingErrorMessage =
-      'You denied the permission of reading the SMS messages.\nRe-activate form the settings';
+          'You denied the permission of reading the SMS messages.\nRe-activate form the settings';
       _emitIsLoadingState(false);
     }
   }

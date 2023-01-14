@@ -19,5 +19,5 @@ List<Color> colorSwatch = [
 
 
 
-const double bodyFontSize = 14;
-const double titleFontSize = 16;
+const double kBodyFontSize = 14;
+const double kTitleFontSize = 16;

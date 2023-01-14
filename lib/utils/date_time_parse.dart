@@ -22,6 +22,13 @@ abstract class DateTimeParse {
     return dateString;
   }
 
+  /// Parse Date/Time String - Return Custom Date/Time String
+  static parseDateTimeReturnMonthString(String dateTimeString) {
+    var dateTime = DateTime.parse(dateTimeString).toLocal();
+    String dateString = DateFormat('MMMM').format(dateTime);
+    return dateString;
+  }
+
   /// Parse Date/Time - Return Description (today, yesterday .. etc)
   // static parseDateTimeReturnDescriptionString(String dateTimeString) {
   //   DateTime dateTime = DateTime.parse(dateTimeString).toLocal();
