@@ -150,11 +150,23 @@ class SmsController extends GetxController {
       ];
 
       smsMessageListToShow = smsMessageList;
-      for (int i = 0; i < smsMessageList.length; i++) {
+      for (int i = 0; i < smsMessageListToShow.length; i++) {
+        bool isFirstItem = i == 0;
+        bool isNotFirstItem = i > 0;
+        bool isSameYear = isNotFirstItem
+            ? smsMessageListToShow[i].date?.year == smsMessageListToShow[i - 1].date?.year
+            : true;
+        bool isDifferentMonths = isNotFirstItem
+            ? smsMessageListToShow[i].date?.month != smsMessageListToShow[i - 1].date?.month
+            : false;
+        bool isDifferentYears = isNotFirstItem
+            ? smsMessageListToShow[i].date?.year != smsMessageListToShow[i - 1].date?.year
+            : false;
         isExpanded.add(false);
-        if (i == 0 || i > 0 && smsMessageList[i].date?.month != smsMessageList[i - 1].date?.month) {
+        if (isFirstItem || isNotFirstItem && isSameYear && isDifferentMonths || isDifferentYears) {
           addToMonthCount();
         }
+        log('/// For Loop ${i + 1}');
       }
       _emitIsLoadingState(false);
     } catch (e, stacktrace) {
