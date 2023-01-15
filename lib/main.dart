@@ -1,13 +1,13 @@
 import 'dart:developer';
-
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sms/Presentation_layer/sms_app.dart';
+import 'package:sms/utils/string_utils.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
+
 
   runApp(
     DevicePreview(
@@ -17,17 +17,3 @@ void main() {
     ),
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

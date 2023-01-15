@@ -16,6 +16,7 @@ class SmsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Material(
       child: Scaffold(
         backgroundColor: kBackgroundColor,
@@ -164,7 +165,7 @@ class SmsView extends StatelessWidget {
                                       /// Search field
                                       Container(
                                         height: 50,
-                                        width: Get.width - 90,
+                                        width: MediaQuery.of(context).size.width - 90,
                                         decoration: BoxDecoration(
                                           // color: kBackgroundColor,
                                           borderRadius: BorderRadius.circular(14),
@@ -182,7 +183,7 @@ class SmsView extends StatelessWidget {
                                         child: TextFormField(
                                           onChanged: (keyword) {
                                             if (keyword.removeAllWhitespace.isNotEmpty) {
-                                              controller.filter(keyword);
+                                              controller.filter(keyword: keyword);
                                             } else {
                                               controller.clearFilter();
                                             }
@@ -266,177 +267,181 @@ class SmsView extends StatelessWidget {
                             /// SMS messages list
                             Padding(
                               padding: const EdgeInsets.only(top: 9),
-                              child: Container(
-                                height: Get.height - 290,
-                                decoration: const BoxDecoration(
-                                  color: kBackgroundColor,
-                                ),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: controller.smsMessageListToShow.length,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    Sms item = controller.smsMessageListToShow[index];
-                                    Sms prevItem =
-                                        index > 0 ? controller.smsMessageListToShow[index - 1] : item;
-                                    Color backColor = kBackgroundLighterColor;
-                                    Color textColor = kPrimaryColor;
+                              child: RefreshIndicator(
+                                onRefresh: () => controller.fetchSmsMessages(keyword: controller.searchKeywordController.text),
+                                backgroundColor: kBackgroundLighterColor,
+                                child: Container(
+                                  height: MediaQuery.of(context).size.height - 290,
+                                  decoration: const BoxDecoration(
+                                    color: kBackgroundColor,
+                                  ),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: controller.smsMessageListToShow.length,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      Sms item = controller.smsMessageListToShow[index];
+                                      Sms prevItem =
+                                          index > 0 ? controller.smsMessageListToShow[index - 1] : item;
+                                      Color backColor = kBackgroundLighterColor;
+                                      Color textColor = kPrimaryColor;
 
-                                    return Column(
-                                      children: [
-                                        if (index == 0 ||
-                                            index > 0 && item.date?.month != prevItem.date?.month)
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 8),
-                                            child: Text(
-                                              DateTimeParse.parseDateTimeReturnMonthString(
-                                                      item.date.toString())
-                                                  .toString()
-                                                  .toUpperCase(),
-                                              style: const TextStyle(
-                                                color: kPrimaryColor,
-                                                fontSize: kBodyFontSize,
+                                      return Column(
+                                        children: [
+                                          if (index == 0 ||
+                                              index > 0 && item.date?.month != prevItem.date?.month)
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
+                                              child: Text(
+                                                DateTimeParse.parseDateTimeReturnMonthString(
+                                                        item.date.toString())
+                                                    .toString()
+                                                    .toUpperCase(),
+                                                style: const TextStyle(
+                                                  color: kPrimaryColor,
+                                                  fontSize: kBodyFontSize,
+                                                ),
                                               ),
                                             ),
-                                          ),
 
-                                        /// SMS item
-                                        Container(
-                                          margin: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
-                                          decoration: BoxDecoration(
-                                            color: backColor,
-                                            borderRadius: BorderRadius.circular(14),
-                                            // borderRadius: BorderRadius.only(
-                                            //   bottomLeft: Radius.circular(14),
-                                            //   bottomRight: Radius.circular(14),
-                                            // ),
-                                            border: Border.all(
-                                              color: controller.isExpanded[index]
-                                                  ? kPrimaryColor
-                                                  : kPrimaryColor.withOpacity(0.25),
-                                              width: controller.isExpanded[index] ? 1 : 1,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: kShadowColor,
-                                                blurRadius: 4,
-                                                spreadRadius: 1,
-                                                offset: Offset(0, 0),
+                                          /// SMS item
+                                          Container(
+                                            margin: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
+                                            decoration: BoxDecoration(
+                                              color: backColor,
+                                              borderRadius: BorderRadius.circular(14),
+                                              // borderRadius: BorderRadius.only(
+                                              //   bottomLeft: Radius.circular(14),
+                                              //   bottomRight: Radius.circular(14),
+                                              // ),
+                                              border: Border.all(
+                                                color: controller.isExpanded[index]
+                                                    ? kPrimaryColor
+                                                    : kPrimaryColor.withOpacity(0.25),
+                                                width: controller.isExpanded[index] ? 1 : 1,
                                               ),
-                                            ],
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(13),
-                                            child: ExpansionTile(
-                                              key: controller.expansionTileReRenderKey,
-                                              collapsedBackgroundColor: backColor,
-                                              collapsedIconColor: kPrimaryColor,
-                                              collapsedTextColor: kPrimaryColor,
-                                              textColor: textColor,
-                                              backgroundColor: backColor,
-                                              initiallyExpanded: controller.isExpanded[index],
-                                              onExpansionChanged: (state) {
-                                                controller.changeIsExpandedState(state, index);
-                                              },
-                                              // maintainState: false,
-                                              title: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    item.sender!,
-                                                    style: TextStyle(
-                                                      fontSize: kBodyFontSize,
-                                                      color: textColor,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${item.amount!.formatThousands()} AED',
-                                                    style: TextStyle(
-                                                      fontSize: kBodyFontSize,
-                                                      color: textColor,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              trailing: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    DateTimeParse.parseDateTimeReturnDateString(
-                                                      item.date.toString(),
-                                                    ),
-                                                    style: TextStyle(
-                                                      fontSize: kBodyFontSize,
-                                                      color: textColor,
-                                                    ),
-                                                  ),
-                                                  Icon(
-                                                    controller.isExpanded[index]
-                                                        ? Icons.keyboard_arrow_up
-                                                        : Icons.keyboard_arrow_down,
-                                                    color: textColor,
-                                                  ),
-                                                ],
-                                              ),
-                                              children: [
-                                                Container(
-                                                  width: double.infinity,
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: const BoxDecoration(
-                                                    color: kBackgroundColor,
-                                                    borderRadius: BorderRadius.only(
-                                                      bottomLeft: Radius.circular(10),
-                                                      bottomRight: Radius.circular(10),
-                                                    ),
-                                                  ),
-                                                  child: controller.searchKeywordController.text
-                                                          .removeAllWhitespace.isEmpty
-                                                      ? Text(
-                                                          item.body!,
-                                                          textAlign: TextAlign.start,
-                                                          style: const TextStyle(
-                                                            fontSize: kBodyFontSize,
-                                                            color: kWhiteColor,
-                                                          ),
-                                                        )
-                                                      : RichText(
-                                                          text: TextSpan(
-                                                            children: List.generate(
-                                                                controller.getTextSpanLength(item,
-                                                                    controller.searchKeywordController.text),
-                                                                (index) {
-                                                              String text = controller.getBodyText(
-                                                                  item,
-                                                                  controller
-                                                                      .searchKeywordController.text)[index];
-                                                              return TextSpan(
-                                                                text: text,
-                                                                style: TextStyle(
-                                                                  fontSize: kBodyFontSize,
-                                                                  color: text ==
-                                                                          controller
-                                                                              .searchKeywordController.text
-                                                                      ? kPrimaryColor
-                                                                      : kWhiteColor,
-                                                                  decoration: text ==
-                                                                          controller
-                                                                              .searchKeywordController.text
-                                                                      ? TextDecoration.underline
-                                                                      : null,
-                                                                ),
-                                                              );
-                                                            }).toList(),
-                                                          ),
-                                                        ),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: kShadowColor,
+                                                  blurRadius: 4,
+                                                  spreadRadius: 1,
+                                                  offset: Offset(0, 0),
                                                 ),
                                               ],
                                             ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(13),
+                                              child: ExpansionTile(
+                                                key: controller.expansionTileReRenderKey,
+                                                collapsedBackgroundColor: backColor,
+                                                collapsedIconColor: kPrimaryColor,
+                                                collapsedTextColor: kPrimaryColor,
+                                                textColor: textColor,
+                                                backgroundColor: backColor,
+                                                initiallyExpanded: controller.isExpanded[index],
+                                                onExpansionChanged: (state) {
+                                                  controller.changeIsExpandedState(state, index);
+                                                },
+                                                // maintainState: false,
+                                                title: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      item.sender!,
+                                                      style: TextStyle(
+                                                        fontSize: kBodyFontSize,
+                                                        color: textColor,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${item.amount!.formatThousands()} AED',
+                                                      style: TextStyle(
+                                                        fontSize: kBodyFontSize,
+                                                        color: textColor,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                trailing: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      DateTimeParse.parseDateTimeReturnDateString(
+                                                        item.date.toString(),
+                                                      ),
+                                                      style: TextStyle(
+                                                        fontSize: kBodyFontSize,
+                                                        color: textColor,
+                                                      ),
+                                                    ),
+                                                    Icon(
+                                                      controller.isExpanded[index]
+                                                          ? Icons.keyboard_arrow_up
+                                                          : Icons.keyboard_arrow_down,
+                                                      color: textColor,
+                                                    ),
+                                                  ],
+                                                ),
+                                                children: [
+                                                  Container(
+                                                    width: double.infinity,
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: const BoxDecoration(
+                                                      color: kBackgroundColor,
+                                                      borderRadius: BorderRadius.only(
+                                                        bottomLeft: Radius.circular(10),
+                                                        bottomRight: Radius.circular(10),
+                                                      ),
+                                                    ),
+                                                    child: controller.searchKeywordController.text
+                                                            .removeAllWhitespace.isEmpty
+                                                        ? Text(
+                                                            item.body!,
+                                                            textAlign: TextAlign.start,
+                                                            style: const TextStyle(
+                                                              fontSize: kBodyFontSize,
+                                                              color: kWhiteColor,
+                                                            ),
+                                                          )
+                                                        : RichText(
+                                                            text: TextSpan(
+                                                              children: List.generate(
+                                                                  controller.getTextSpanLength(item,
+                                                                      controller.searchKeywordController.text),
+                                                                  (index) {
+                                                                String text = controller.getBodyText(
+                                                                    item,
+                                                                    controller
+                                                                        .searchKeywordController.text)[index];
+                                                                return TextSpan(
+                                                                  text: text,
+                                                                  style: TextStyle(
+                                                                    fontSize: kBodyFontSize,
+                                                                    color: text ==
+                                                                            controller
+                                                                                .searchKeywordController.text
+                                                                        ? kPrimaryColor
+                                                                        : kWhiteColor,
+                                                                    decoration: text ==
+                                                                            controller
+                                                                                .searchKeywordController.text
+                                                                        ? TextDecoration.underline
+                                                                        : null,
+                                                                  ),
+                                                                );
+                                                              }).toList(),
+                                                            ),
+                                                          ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),

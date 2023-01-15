@@ -76,15 +76,17 @@ class SmsController extends GetxController {
     return '$monthCount Months';
   }
 
-  filter(String keyword) {
+  filter({String? keyword, Map<String, dynamic>? params}) {
     smsMessageListToShow = [];
     isExpanded = [];
 
-    for (var item in smsMessageList) {
-      if (item.body!.toLowerCase().contains(keyword.toLowerCase()) ||
-          item.sender!.toLowerCase().contains(keyword.toLowerCase())) {
-        smsMessageListToShow.add(item);
-        isExpanded.add(true);
+    if (keyword != null) {
+      for (var item in smsMessageList) {
+        if (item.body!.toLowerCase().contains(keyword.toLowerCase()) ||
+            item.sender!.toLowerCase().contains(keyword.toLowerCase())) {
+          smsMessageListToShow.add(item);
+          isExpanded.add(true);
+        }
       }
     }
     update();
@@ -126,8 +128,19 @@ class SmsController extends GetxController {
       // TODO: remove this declaration
 
       smsMessageList = [
-        Sms.fromSmsMessage(SmsMessage.fromJson(
-            {'body': 'nnConfiguration nn AED 2,563.05 ;jnndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
+        Sms.fromSmsMessage(SmsMessage.fromJson({
+          'body': 'nn nn aa nn nn bb nn nn cc nn nn',
+          'address': 'Ibrahim',
+          'date': 1640979000000
+        })),Sms.fromSmsMessage(SmsMessage.fromJson({
+          'body': 'nnConfiguration nn AED 2,563.05 ;jnndfg',
+          'address': 'Ibrahim',
+          'date': 1640979000000
+        })),Sms.fromSmsMessage(SmsMessage.fromJson({
+          'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg',
+          'address': 'Ibrahim',
+          'date': 1640979000000
+        })),
         Sms.fromSmsMessage(SmsMessage.fromJson(
             {'body': 'Innovation AED 2,563.05 ;jndfg', 'address': 'Ibrahim', 'date': 1640979000000})),
         Sms.fromSmsMessage(SmsMessage.fromJson(
@@ -171,7 +184,7 @@ class SmsController extends GetxController {
         bool isDifferentYears = isNotFirstItem
             ? smsMessageListToShow[i].date?.year != smsMessageListToShow[i - 1].date?.year
             : false;
-        isExpanded.add(false);
+        keyword == null || keyword.isEmpty ? isExpanded.add(false) : isExpanded.add(true);
         if (isFirstItem || isNotFirstItem && isSameYear && isDifferentMonths || isDifferentYears) {
           addToMonthCount();
         }

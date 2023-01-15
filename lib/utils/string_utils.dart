@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'package:get/get.dart';
 
 class StringUtils {
   static List<String> split({required String str, required String keyword}) {
+
     List<String> splitStrings = [];
     str = str.toLowerCase();
     keyword = keyword.toLowerCase();
@@ -32,6 +34,8 @@ class StringUtils {
     if (splitStrings.first.isEmpty) returnListOfStrings.insert(0, keyword);
     if (splitStrings.last.isEmpty) returnListOfStrings.add(keyword);
 
+    // log('/// I/P: $splitStrings');
+    // log('/// O/p: $returnListOfStrings');
     return returnListOfStrings;
   }
 
