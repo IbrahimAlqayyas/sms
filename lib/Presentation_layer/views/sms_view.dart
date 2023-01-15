@@ -1,12 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
+import 'package:sms/Presentation_layer/widgets/text_field_widget.dart';
 import 'package:sms/theme/theme_constants.dart';
 import 'package:sms/utils/date_time_parse.dart';
 import 'package:sms/utils/number_formatting_extension.dart';
 import 'package:sms/utils/string_utils.dart';
 import '../../data_layer/models/sms.dart';
 import '../widgets/app_bar_widget.dart';
+import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/loading_indicator.dart';
 import '../widgets/version_strip.dart';
 import 'package:get/get.dart';
@@ -16,7 +20,6 @@ class SmsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Material(
       child: Scaffold(
         backgroundColor: kBackgroundColor,
@@ -163,73 +166,32 @@ class SmsView extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       /// Search field
-                                      Container(
-                                        height: 50,
+                                      SizedBox(
                                         width: MediaQuery.of(context).size.width - 90,
-                                        decoration: BoxDecoration(
-                                          // color: kBackgroundColor,
-                                          borderRadius: BorderRadius.circular(14),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: kShadowColor,
-                                            ),
-                                            BoxShadow(
-                                              color: kBackgroundColor,
-                                              spreadRadius: -6.0,
-                                              blurRadius: 6.0,
-                                            ),
-                                          ],
-                                        ),
-                                        child: TextFormField(
-                                          onChanged: (keyword) {
+                                        child: TextFieldWidget(
+                                          controller: controller.searchKeywordController,
+                                          hintText: 'Search ..',
+                                          onChanged: (String keyword) {
                                             if (keyword.removeAllWhitespace.isNotEmpty) {
-                                              controller.filter(keyword: keyword);
+                                              controller.fetchSmsMessages(keyword: keyword);
                                             } else {
                                               controller.clearFilter();
                                             }
                                           },
-                                          controller: controller.searchKeywordController,
-                                          cursorColor: kPrimaryColor,
-                                          cursorHeight: 20,
-                                          textAlign: TextAlign.start,
-                                          maxLines: 1,
-                                          style: const TextStyle(color: kPrimaryColor),
-                                          decoration: InputDecoration(
-                                            fillColor: kBackgroundLighterColor,
-                                            hintText: 'Search ..',
-                                            hintStyle: const TextStyle(
-                                              color: kGreyColor,
-                                              height: 0.75,
-                                            ),
-                                            focusedBorder: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: kPrimaryColor,
-                                                width: 1,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14)),
-                                            ),
-                                            enabledBorder: const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: kPrimaryColor,
-                                                width: 1,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14)),
-                                            ),
-                                            suffixIcon: controller.searchKeywordController.text.isNotEmpty
-                                                ? InkWell(
-                                                    onTap: () {
-                                                      controller.clearFilter();
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.clear,
-                                                      color: kPrimaryColor,
-                                                    ),
-                                                  )
-                                                : const Icon(
-                                                    Icons.search,
+                                          suffix: controller.searchKeywordController.text.isNotEmpty
+                                              ? InkWell(
+                                                  onTap: () {
+                                                    controller.clearFilter();
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.clear,
                                                     color: kPrimaryColor,
                                                   ),
-                                          ),
+                                                )
+                                              : const Icon(
+                                                  Icons.search,
+                                                  color: kPrimaryColor,
+                                                ),
                                         ),
                                       ),
 
@@ -246,9 +208,20 @@ class SmsView extends StatelessWidget {
                                           ),
                                         ),
                                         child: IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(
-                                            Icons.tune,
+                                          onPressed: () {
+                                            if (controller.isFiltered) {
+                                              controller.fetchSmsMessages().then((_) {
+                                                Get.find<SmsController>().changeIsFilteredState(false);
+                                              });
+                                            } else {
+                                              showFilterBottomSheet(onFilter: (params) {
+                                                controller.fetchSmsMessages(params: params);
+                                              });
+                                              Get.find<SmsController>().changeIsFilteredState(true);
+                                            }
+                                          },
+                                          icon: Icon(
+                                            controller.isFiltered ? Icons.clear : Icons.tune,
                                             color: kBackgroundColor,
                                             size: 30,
                                           ),
@@ -268,7 +241,8 @@ class SmsView extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(top: 9),
                               child: RefreshIndicator(
-                                onRefresh: () => controller.fetchSmsMessages(keyword: controller.searchKeywordController.text),
+                                onRefresh: () => controller.fetchSmsMessages(
+                                    keyword: controller.searchKeywordController.text),
                                 backgroundColor: kBackgroundLighterColor,
                                 child: Container(
                                   height: MediaQuery.of(context).size.height - 290,
@@ -283,8 +257,6 @@ class SmsView extends StatelessWidget {
                                       Sms item = controller.smsMessageListToShow[index];
                                       Sms prevItem =
                                           index > 0 ? controller.smsMessageListToShow[index - 1] : item;
-                                      Color backColor = kBackgroundLighterColor;
-                                      Color textColor = kPrimaryColor;
 
                                       return Column(
                                         children: [
@@ -308,12 +280,8 @@ class SmsView extends StatelessWidget {
                                           Container(
                                             margin: const EdgeInsets.only(bottom: 8, right: 8, left: 8),
                                             decoration: BoxDecoration(
-                                              color: backColor,
+                                              color: kBackgroundLighterColor,
                                               borderRadius: BorderRadius.circular(14),
-                                              // borderRadius: BorderRadius.only(
-                                              //   bottomLeft: Radius.circular(14),
-                                              //   bottomRight: Radius.circular(14),
-                                              // ),
                                               border: Border.all(
                                                 color: controller.isExpanded[index]
                                                     ? kPrimaryColor
@@ -333,11 +301,11 @@ class SmsView extends StatelessWidget {
                                               borderRadius: BorderRadius.circular(13),
                                               child: ExpansionTile(
                                                 key: controller.expansionTileReRenderKey,
-                                                collapsedBackgroundColor: backColor,
+                                                collapsedBackgroundColor: kBackgroundLighterColor,
                                                 collapsedIconColor: kPrimaryColor,
                                                 collapsedTextColor: kPrimaryColor,
-                                                textColor: textColor,
-                                                backgroundColor: backColor,
+                                                textColor: kPrimaryColor,
+                                                backgroundColor: kBackgroundLighterColor,
                                                 initiallyExpanded: controller.isExpanded[index],
                                                 onExpansionChanged: (state) {
                                                   controller.changeIsExpandedState(state, index);
@@ -348,16 +316,16 @@ class SmsView extends StatelessWidget {
                                                   children: [
                                                     Text(
                                                       item.sender!,
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         fontSize: kBodyFontSize,
-                                                        color: textColor,
+                                                        color: kPrimaryColor,
                                                       ),
                                                     ),
                                                     Text(
                                                       '${item.amount!.formatThousands()} AED',
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         fontSize: kBodyFontSize,
-                                                        color: textColor,
+                                                        color: kPrimaryColor,
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
@@ -370,16 +338,16 @@ class SmsView extends StatelessWidget {
                                                       DateTimeParse.parseDateTimeReturnDateString(
                                                         item.date.toString(),
                                                       ),
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         fontSize: kBodyFontSize,
-                                                        color: textColor,
+                                                        color: kPrimaryColor,
                                                       ),
                                                     ),
                                                     Icon(
                                                       controller.isExpanded[index]
                                                           ? Icons.keyboard_arrow_up
                                                           : Icons.keyboard_arrow_down,
-                                                      color: textColor,
+                                                      color: kPrimaryColor,
                                                     ),
                                                   ],
                                                 ),
@@ -407,9 +375,10 @@ class SmsView extends StatelessWidget {
                                                         : RichText(
                                                             text: TextSpan(
                                                               children: List.generate(
-                                                                  controller.getTextSpanLength(item,
-                                                                      controller.searchKeywordController.text),
-                                                                  (index) {
+                                                                  controller.getTextSpanLength(
+                                                                      item,
+                                                                      controller.searchKeywordController
+                                                                          .text), (index) {
                                                                 String text = controller.getBodyText(
                                                                     item,
                                                                     controller
@@ -493,7 +462,7 @@ class SmsView extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          controller.getTotalMonths(),
+                                          controller.getTotalMonths(controller.monthCount),
                                           style: const TextStyle(
                                             fontSize: kBodyFontSize,
                                             color: kPrimaryColor,

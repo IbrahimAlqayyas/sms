@@ -12,8 +12,9 @@ class SmsApp extends StatelessWidget {
       title: 'SMS Application',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.orange,
         primaryColor: kPrimaryColor,
+        backgroundColor: kBackgroundColor,
         fontFamily: 'A Jannat LT Regular',
       ),
       home: const SplashView(),
