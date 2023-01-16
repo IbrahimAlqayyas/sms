@@ -1,10 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import 'package:sms/Presentation_layer/widgets/text_field_widget.dart';
 import 'package:sms/theme/theme_constants.dart';
 
@@ -131,6 +127,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     double spacing = 16.0;
+    double txtSizedBoxWidth = 100.0;
     return SingleChildScrollView(
       child: Container(
         decoration: BoxDecoration(
@@ -189,11 +186,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   Row(
                     children: [
                       /// Sender
-                      const Text(
-                        'Sender',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Sender',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -210,9 +210,20 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                               //   controller.clearFilter();
                             }
                           },
-                          prefix: const Icon(
+                          suffix: const Icon(
                             Icons.person,
                             color: kPrimaryColor,
+                          ),
+                        ),
+                      ),
+
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kBodyFontSize,
                           ),
                         ),
                       ),
@@ -224,11 +235,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   /// Amount From
                   Row(
                     children: [
-                      const Text(
-                        'Amount from',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Amount from',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -259,6 +273,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           ),
                         ),
                       ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kBodyFontSize,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: spacing),
@@ -266,11 +290,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   /// Amount To
                   Row(
                     children: [
-                      const Text(
-                        'Amount to',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Amount to',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -300,6 +327,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           ),
                         ),
                       ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kBodyFontSize,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: spacing),
@@ -307,11 +344,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   /// DateFrom
                   Row(
                     children: [
-                      const Text(
-                        'Date from',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Date from',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -357,6 +397,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           ),
                         ),
                       ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kBodyFontSize,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: spacing),
@@ -364,11 +414,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   /// Date To
                   Row(
                     children: [
-                      const Text(
-                        'Date to',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Date to',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -414,18 +467,31 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           ),
                         ),
                       ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kBodyFontSize,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: spacing),
 
-                  /// Date To
+                  /// Transaction Switch
                   Row(
                     children: [
-                      const Text(
-                        'Transactions',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: kTitleFontSize,
+                      SizedBox(
+                        width: txtSizedBoxWidth,
+                        child: const Text(
+                          'Transactions',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: kTitleFontSize,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),

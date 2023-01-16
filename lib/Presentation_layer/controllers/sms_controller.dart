@@ -16,34 +16,17 @@ class SmsController extends GetxController {
   bool? isLoadingMessages;
   String? loadingErrorMessage;
   List<Sms> smsMessageList = [
-    Sms.fromSmsMessage(SmsMessage.fromJson({
-      'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg',
-      'address': 'Ibrahim',
-      'date': 1640979000000
-    })),
-    Sms.fromSmsMessage(SmsMessage.fromJson({
-      'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg',
-      'address': 'Ibrahim',
-      'date': 1640979000000
-    })),
-    Sms.fromSmsMessage(SmsMessage.fromJson(
-        {'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Mohamed', 'date': 1652486621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson(
-        {'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Mohamed', 'date': 1647216221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson(
-        {'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson(
-        {'body': 'Clarification AED 63.05 ;jndfgnn', 'address': 'Ahmed', 'date': 1642118621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson(
-        {'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(
-        SmsMessage.fromJson({'body': '63.05 AED ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(
-        SmsMessage.fromJson({'body': 'AED 63.05 ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(
-        SmsMessage.fromJson({'body': ';Encapsulation 63.05 AED', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(
-        SmsMessage.fromJson({'body': ';No hesitation 10000.05', 'address': 'Rovan', 'date': 1636848221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg','address': 'Ibrahim','date': 1640979000000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg','address': 'Ibrahim','date': 1640979000000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Mohamed', 'date': 1652486621000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Mohamed', 'date': 1647216221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Clarification AED 63.05 ;jndfgnn', 'address': 'Ahmed', 'date': 1642118621000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Rovan', 'date': 1636848221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': '63.05  ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': '63.05 ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': ';Encapsulation 63.05 ', 'address': 'Rovan', 'date': 1636848221000})),
+    Sms.fromSmsMessage(SmsMessage.fromJson({'body': ';No hesitation 10000.05', 'address': 'Rovan', 'date': 1636848221000})),
   ];
 
   List<Sms> smsMessageListToShow = [];
@@ -55,7 +38,8 @@ class SmsController extends GetxController {
   UniqueKey? expansionTileReRenderKey;
   bool isFiltered = false;
 
-  addToMonthCount(List<Sms> smsList) {
+  getMonthCount(List<Sms> smsList) {
+    monthCount = 0;
     for (int i = 0; i < smsList.length; i++) {
       bool isFirstItem = i == 0;
       bool isNotFirstItem = i > 0;
@@ -130,7 +114,7 @@ class SmsController extends GetxController {
     return amount.formatThousands();
   }
 
-  _showMessagesOnScreen(List<Sms> listToShow, bool expandAll) {
+  _showMessagesOnScreen(List<Sms> listToShow, {bool expandAll = false}) {
     smsMessageListToShow = listToShow;
     for (int i = 0; i < smsMessageListToShow.length; i++) {
       expandAll ? isExpanded.add(true) : isExpanded.add(false);
@@ -149,26 +133,23 @@ class SmsController extends GetxController {
     update();
   }
 
-
   /// fetch from cellphone
   /// fetch after filter with keyword
   /// fetch after filter with parameters
   fetchSmsMessages({String? keyword, Map<String, dynamic>? params}) async {
     try {
-      monthCount = 0;
       smsMessageListToShow = [];
       isExpanded = [];
       fetchFailed = false;
       if ((keyword == null || keyword.removeAllWhitespace == '') && params == null) {
         await _fetchSmsMessagesFromCellphone(smsService: Fetch());
-      } else if (keyword!.removeAllWhitespace.isNotEmpty) {
+      } else if (keyword != null && keyword.removeAllWhitespace.isNotEmpty) {
         _filter(keyword: keyword);
       } else if (params != null) {
         _filter(params: params);
       } else {
         showSnackBar('[DEV]', message: 'Un-managed Fetch State');
       }
-
     } catch (e, stacktrace) {
       fetchFailed = true;
       log(e.toString());
@@ -180,7 +161,9 @@ class SmsController extends GetxController {
   _filter({String? keyword, Map<String, dynamic>? params}) {
     if ((keyword == null || keyword.removeAllWhitespace == '') && params == null) {
       smsMessageListToShow = smsMessageList;
-    } else if (keyword != null) {
+      getMonthCount(smsMessageListToShow);
+      _showMessagesOnScreen(smsMessageListToShow, expandAll: true);
+    } else if (keyword != null && keyword.removeAllWhitespace.isNotEmpty) {
       _filterUsingKeyword(keyword);
     } else if (params != null) {
       _filterUsingParameters(params);
@@ -200,59 +183,59 @@ class SmsController extends GetxController {
         isExpanded.add(true);
       }
     }
-    addToMonthCount(smsMessageListToShow);
-    _showMessagesOnScreen(smsMessageListToShow, true);
+    getMonthCount(smsMessageListToShow);
+    _showMessagesOnScreen(smsMessageListToShow, expandAll: true);
   }
 
   _filterUsingParameters(Map<String, dynamic> params) {
-    // todo: remove
-    log(params.toString());
-
-    if (params['sender'] == null &&
-        params['amountFrom'] == null &&
-        params['amountTo'] == null &&
-        params['dateFrom'] == null &&
-        params['dateTo'] == null &&
-        params['dateTo'] == null &&
-        params['onlyTransactions'] == false) {
+    smsMessageListToShow = [];
+    isExpanded = [];
+    if (params['sender'] == null
+        && params['amountFrom'] == null && params['amountTo'] == null
+        && params['dateFrom'] == null && params['dateTo'] == null
+        && params['onlyTransactions'] == false) {
       isFiltered = false;
-      fetchSmsMessages();
+      smsMessageListToShow = smsMessageList;
+      getMonthCount(smsMessageListToShow);
+      _showMessagesOnScreen(smsMessageListToShow, expandAll: true);
     } else {
       for (var item in smsMessageList) {
-        if ((params['sender'] != null &&
-                    item.sender!.toLowerCase().contains(params['sender'].toString().toLowerCase())) ||
-                (params['amountFrom'] != null &&
-                    params['amountTo'] == null &&
-                    item.amount! >= params['amountFrom']) ||
-                (params['amountFrom'] == null &&
-                    params['amountTo'] != null &&
-                    item.amount! <= params['amountTo']) ||
-                (params['amountFrom'] != null &&
-                    params['amountTo'] != null &&
-                    item.amount! >= params['amountFrom'] &&
-                    item.amount! <= params['amountTo']) ||
-                (params['dateFrom'] != null &&
-                    params['dateTo'] != null &&
-                    item.date!.compareTo(params['dateFrom']) >= 0 &&
-                    item.date!.compareTo(params['dateTo']) <= 0)
+        bool senderMatch = params['sender'] != null && item.sender!.toLowerCase().contains(params['sender'].toString().toLowerCase());
+        bool amountFromOnlyMatch = params['amountFrom'] != null && params['amountTo'] == null && item.amount! >= params['amountFrom'];
+        bool amountToOnlyMatch = params['amountFrom'] == null && params['amountTo'] != null && item.amount! <= params['amountTo'];
+        bool amountFromToMatch =params['amountFrom'] != null && params['amountTo'] != null && item.amount! >= params['amountFrom'] && item.amount! <= params['amountTo'];
+        bool dateFromToMatch = params['dateFrom'] != null && params['dateTo'] != null && item.date!.compareTo(params['dateFrom']) >= 0 && item.date!.compareTo(params['dateTo']) <= 0;
+        bool dateFromOnlyMatch = params['dateFrom'] != null && params['dateTo'] == null && item.date!.compareTo(params['dateFrom']) >= 0;
+        bool dateToOnlyMatch = params['dateFrom'] == null && params['dateTo'] != null && item.date!.compareTo(params['dateTo']) <= 0;
+        bool onlyTransactionMatch = params['onlyTransactions'] == true;
 
-            // (params['onlyTransactions'] != null && item.amount! > 0.0)
 
-            ) {
-          smsMessageListToShow.add(item);
-          isExpanded.add(true);
+        if (onlyTransactionMatch) {
+          if(senderMatch || amountFromOnlyMatch || amountToOnlyMatch || dateFromOnlyMatch|| dateToOnlyMatch ||amountFromToMatch || dateFromToMatch) {
+            smsMessageListToShow.addIf(item.isTransaction!, item);
+            isExpanded.addIf(item.isTransaction!, true);
+          } else {
+            smsMessageListToShow.addIf(item.isTransaction!, item);
+            isExpanded.addIf(item.isTransaction!, true);
+          }
+        } else {
+          if(senderMatch || amountFromOnlyMatch || amountToOnlyMatch || dateFromOnlyMatch|| dateToOnlyMatch ||amountFromToMatch || dateFromToMatch) {
+              smsMessageListToShow.add(item);
+              isExpanded.add(true);
+          }
         }
       }
     }
-    addToMonthCount(smsMessageListToShow);
-    _showMessagesOnScreen(smsMessageListToShow, true);
+    getMonthCount(smsMessageListToShow);
+    _showMessagesOnScreen(smsMessageListToShow, expandAll: true);
+    log(smsMessageListToShow.toString());
   }
 
   _fetchSmsMessagesFromCellphone({required SmsService smsService}) async {
     smsMessageList = await smsService.fetchMessages();
     smsMessageList.convertIntoEmptyListIfNull<SmsMessage>();
-    addToMonthCount(smsMessageList);
-    _showMessagesOnScreen(smsMessageList, false);
+    getMonthCount(smsMessageList);
+    _showMessagesOnScreen(smsMessageList, expandAll: false);
   }
 
   _checkPermissionAndFetchMessages() async {
