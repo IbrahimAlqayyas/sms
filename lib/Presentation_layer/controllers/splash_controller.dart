@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import '../views/sms_view.dart';
 
 class SplashController extends GetxController {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sms/Presentation_layer/controllers/splash_controller.dart';
-import 'package:sms/theme/theme_constants.dart';
 import 'package:get/get.dart';
+
+import '../theme/theme_constants.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});

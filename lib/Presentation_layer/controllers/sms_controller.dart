@@ -9,26 +9,12 @@ import 'package:sms/utils/permission_handler.dart';
 import 'package:sms/utils/string_utils.dart';
 import '../../data_layer/models/sms.dart';
 import '../../data_layer/services/fetch.dart';
-import '../../data_layer/services/filter.dart';
 import '../widgets/snackbar_widget.dart';
 
 class SmsController extends GetxController {
   bool? isLoadingMessages;
   String? loadingErrorMessage;
-  List<Sms> smsMessageList = [
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg','address': 'Ibrahim','date': 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'nnConfiguration confgu nn AED 2,563.05 ;jnndfg','address': 'Ibrahim','date': 1640979000000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Configuration AED 2574.05 ;jndfg', 'address': 'Mohamed', 'date': 1652486621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Innovation AED 2,000.0 ;jndfg', 'address': 'Mohamed', 'date': 1647216221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Innovation AED 63.05 ;jndfg', 'address': 'Ahmed', 'date': 1642118621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Clarification AED 63.05 ;jndfgnn', 'address': 'Ahmed', 'date': 1642118621000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': 'Clarification AED 63.05 AED ;jndfg', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': '63.05  ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': '63.05 ;Encapsulation', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': ';Encapsulation 63.05 ', 'address': 'Rovan', 'date': 1636848221000})),
-    Sms.fromSmsMessage(SmsMessage.fromJson({'body': ';No hesitation 10000.05', 'address': 'Rovan', 'date': 1636848221000})),
-  ];
-
+  List<Sms> smsMessageList = [];
   List<Sms> smsMessageListToShow = [];
   List<bool> isExpanded = [];
   Permission? permissionStatus;
@@ -190,28 +176,49 @@ class SmsController extends GetxController {
   _filterUsingParameters(Map<String, dynamic> params) {
     smsMessageListToShow = [];
     isExpanded = [];
-    if (params['sender'] == null
-        && params['amountFrom'] == null && params['amountTo'] == null
-        && params['dateFrom'] == null && params['dateTo'] == null
-        && params['onlyTransactions'] == false) {
+    if (params['sender'] == null &&
+        params['amountFrom'] == null &&
+        params['amountTo'] == null &&
+        params['dateFrom'] == null &&
+        params['dateTo'] == null &&
+        params['onlyTransactions'] == false) {
       isFiltered = false;
       smsMessageListToShow = smsMessageList;
       getMonthCount(smsMessageListToShow);
       _showMessagesOnScreen(smsMessageListToShow, expandAll: true);
     } else {
       for (var item in smsMessageList) {
-        bool senderMatch = params['sender'] != null && item.sender!.toLowerCase().contains(params['sender'].toString().toLowerCase());
-        bool amountFromOnlyMatch = params['amountFrom'] != null && params['amountTo'] == null && item.amount! >= params['amountFrom'];
-        bool amountToOnlyMatch = params['amountFrom'] == null && params['amountTo'] != null && item.amount! <= params['amountTo'];
-        bool amountFromToMatch =params['amountFrom'] != null && params['amountTo'] != null && item.amount! >= params['amountFrom'] && item.amount! <= params['amountTo'];
-        bool dateFromToMatch = params['dateFrom'] != null && params['dateTo'] != null && item.date!.compareTo(params['dateFrom']) >= 0 && item.date!.compareTo(params['dateTo']) <= 0;
-        bool dateFromOnlyMatch = params['dateFrom'] != null && params['dateTo'] == null && item.date!.compareTo(params['dateFrom']) >= 0;
-        bool dateToOnlyMatch = params['dateFrom'] == null && params['dateTo'] != null && item.date!.compareTo(params['dateTo']) <= 0;
+        bool senderMatch = params['sender'] != null &&
+            item.sender!.toLowerCase().contains(params['sender'].toString().toLowerCase());
+        bool amountFromOnlyMatch = params['amountFrom'] != null &&
+            params['amountTo'] == null &&
+            item.amount! >= params['amountFrom'];
+        bool amountToOnlyMatch =
+            params['amountFrom'] == null && params['amountTo'] != null && item.amount! <= params['amountTo'];
+        bool amountFromToMatch = params['amountFrom'] != null &&
+            params['amountTo'] != null &&
+            item.amount! >= params['amountFrom'] &&
+            item.amount! <= params['amountTo'];
+        bool dateFromToMatch = params['dateFrom'] != null &&
+            params['dateTo'] != null &&
+            item.date!.compareTo(params['dateFrom']) >= 0 &&
+            item.date!.compareTo(params['dateTo']) <= 0;
+        bool dateFromOnlyMatch = params['dateFrom'] != null &&
+            params['dateTo'] == null &&
+            item.date!.compareTo(params['dateFrom']) >= 0;
+        bool dateToOnlyMatch = params['dateFrom'] == null &&
+            params['dateTo'] != null &&
+            item.date!.compareTo(params['dateTo']) <= 0;
         bool onlyTransactionMatch = params['onlyTransactions'] == true;
 
-
         if (onlyTransactionMatch) {
-          if(senderMatch || amountFromOnlyMatch || amountToOnlyMatch || dateFromOnlyMatch|| dateToOnlyMatch ||amountFromToMatch || dateFromToMatch) {
+          if (senderMatch ||
+              amountFromOnlyMatch ||
+              amountToOnlyMatch ||
+              dateFromOnlyMatch ||
+              dateToOnlyMatch ||
+              amountFromToMatch ||
+              dateFromToMatch) {
             smsMessageListToShow.addIf(item.isTransaction!, item);
             isExpanded.addIf(item.isTransaction!, true);
           } else {
@@ -219,9 +226,15 @@ class SmsController extends GetxController {
             isExpanded.addIf(item.isTransaction!, true);
           }
         } else {
-          if(senderMatch || amountFromOnlyMatch || amountToOnlyMatch || dateFromOnlyMatch|| dateToOnlyMatch ||amountFromToMatch || dateFromToMatch) {
-              smsMessageListToShow.add(item);
-              isExpanded.add(true);
+          if (senderMatch ||
+              amountFromOnlyMatch ||
+              amountToOnlyMatch ||
+              dateFromOnlyMatch ||
+              dateToOnlyMatch ||
+              amountFromToMatch ||
+              dateFromToMatch) {
+            smsMessageListToShow.add(item);
+            isExpanded.add(true);
           }
         }
       }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sms/theme/theme_constants.dart';
+import '../theme/theme_constants.dart';
 
 showSnackBar(str,
     {message = '',
@@ -24,4 +24,3 @@ showSnackBar(str,
     boxShadows: boxShadow,
   );
 }
-

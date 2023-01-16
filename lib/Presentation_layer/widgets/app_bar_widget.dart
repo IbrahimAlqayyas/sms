@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../theme/theme_constants.dart';
+
+import '../theme/theme_constants.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   const AppBarWidget({Key? key, this.actions})

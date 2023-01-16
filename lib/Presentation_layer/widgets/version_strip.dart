@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../theme/theme_constants.dart';
-import '../../utils/app_constants.dart';
+import '../../utils/app.dart';
+import '../theme/theme_constants.dart';
 
 class VersionStripWidget extends StatelessWidget {
   const VersionStripWidget({

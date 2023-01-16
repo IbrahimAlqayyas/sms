@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:sms/Presentation_layer/controllers/sms_controller.dart';
 import 'package:sms/Presentation_layer/widgets/text_field_widget.dart';
-import 'package:sms/theme/theme_constants.dart';
 import 'package:sms/utils/date_time_parse.dart';
 import 'package:sms/utils/number_formatting_extension.dart';
-import 'package:sms/utils/string_utils.dart';
 import '../../data_layer/models/sms.dart';
+import '../theme/theme_constants.dart';
 import '../widgets/app_bar_widget.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/loading_indicator.dart';
@@ -216,10 +212,9 @@ class SmsView extends StatelessWidget {
                                             } else {
                                               showFilterBottomSheet(onFilter: (params) {
                                                 controller.fetchSmsMessages(params: params);
-                                              }).then((_){
+                                              }).then((_) {
                                                 Get.find<SmsController>().changeIsFilteredState(true);
                                               });
-
                                             }
                                           },
                                           icon: Icon(
@@ -231,10 +226,6 @@ class SmsView extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-
-                                  /// Checkboxes
-                                  ///
-                                  ///
                                 ],
                               ),
                             ),
