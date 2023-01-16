@@ -216,8 +216,10 @@ class SmsView extends StatelessWidget {
                                             } else {
                                               showFilterBottomSheet(onFilter: (params) {
                                                 controller.fetchSmsMessages(params: params);
+                                              }).then((_){
+                                                Get.find<SmsController>().changeIsFilteredState(true);
                                               });
-                                              Get.find<SmsController>().changeIsFilteredState(true);
+
                                             }
                                           },
                                           icon: Icon(

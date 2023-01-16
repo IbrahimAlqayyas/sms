@@ -8,21 +8,20 @@ showFilterBottomSheet({required Function onFilter}) {
   return Get.bottomSheet(
     ConstrainedBox(
       constraints: BoxConstraints(
-        // minHeight: Get.height * 0.8,
         maxHeight: Get.height * 0.9,
       ),
-      child: const FilterBottomSheet(),
+      child: FilterBottomSheet(onFilter: onFilter),
     ),
     isScrollControlled: true,
     enableDrag: true,
     isDismissible: true,
-  ).then((params) {
-    onFilter(params);
-  });
+    enterBottomSheetDuration: const Duration(milliseconds: 800),
+  );
 }
 
 class FilterBottomSheet extends StatefulWidget {
-  const FilterBottomSheet({super.key});
+  const FilterBottomSheet({super.key, this.onFilter});
+  final Function? onFilter;
   @override
   State<FilterBottomSheet> createState() => _FilterBottomSheetState();
 }
@@ -532,6 +531,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             'dateTo': dateTo,
                           };
                           Get.back(result: params);
+                          widget.onFilter!(params);
                         },
                         icon: const Text(
                           'Apply',
