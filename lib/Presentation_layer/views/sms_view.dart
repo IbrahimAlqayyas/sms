@@ -168,6 +168,7 @@ class SmsView extends StatelessWidget {
                                           controller: controller.searchKeywordController,
                                           hintText: 'Search ..',
                                           onChanged: (String keyword) {
+                                            controller.changeIsFilteredState(false);
                                             if (keyword.removeAllWhitespace.isNotEmpty) {
                                               controller.fetchSmsMessages(keyword: keyword);
                                             } else {
@@ -210,6 +211,7 @@ class SmsView extends StatelessWidget {
                                                 Get.find<SmsController>().changeIsFilteredState(false);
                                               });
                                             } else {
+                                              controller.clearFilter();
                                               showFilterBottomSheet(onFilter: (params) {
                                                 controller.fetchSmsMessages(params: params);
                                               }).then((_) {
