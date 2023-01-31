@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:get/get.dart';
-import 'package:sms/utils/number_formatting_extension.dart';
 
 /// Message
 class Sms implements Comparable<Sms> {
