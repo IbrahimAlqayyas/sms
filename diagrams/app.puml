@@ -1,0 +1,212 @@
+@startuml
+set namespaceSeparator ::
+
+class "sms::data_layer::models::sms.dart::Sms" {
+  +int? id
+  +int? threadId
+  +String? sender
+  +String? body
+  +bool? read
+  +DateTime? date
+  +DateTime? dateSent
+  +SmsMessageKind? kind
+  -SmsMessageState _state
+  +double? amount
+  +bool? isTransaction
+  -StreamController<SmsMessageState> _stateStreamController
+  -double? _getAmount()
+  +int compareTo()
+}
+
+"sms::data_layer::models::sms.dart::Sms" o-- "flutter_sms_inbox::flutter_sms_inbox.dart::SmsMessageKind"
+"sms::data_layer::models::sms.dart::Sms" o-- "flutter_sms_inbox::flutter_sms_inbox.dart::SmsMessageState"
+"sms::data_layer::models::sms.dart::Sms" o-- "dart::async::StreamController<SmsMessageState>"
+"dart::core::Comparable" <|-- "sms::data_layer::models::sms.dart::Sms"
+
+class "sms::data_layer::services::fetch.dart::Fetch" {
+  +Future<List<Sms>> fetchMessages()
+  +List<Sms> parseSmsListIntoModels()
+}
+
+"sms::data_layer::services::sms_services.dart::SmsService" <|-- "sms::data_layer::services::fetch.dart::Fetch"
+
+abstract class "sms::data_layer::services::sms_services.dart::SmsService" {
+  +Future<List<Sms>> fetchMessages()
+  +List<Sms> parseSmsListIntoModels()
+}
+
+class "sms::Presentation_layer::controllers::sms_controller.dart::SmsController" {
+  +bool? isLoadingMessages
+  +String? loadingErrorMessage
+  +List<Sms> smsMessageList
+  +List<Sms> smsMessageListToShow
+  +List<bool> isExpanded
+  +Permission? permissionStatus
+  +bool? fetchFailed
+  +int monthCount
+  +TextEditingController searchKeywordController
+  +UniqueKey? expansionTileReRenderKey
+  +bool isFiltered
+  +dynamic getMonthCount()
+  +dynamic clearFilter()
+  +dynamic getTextSpanLength()
+  +dynamic changeIsExpandedState()
+  +dynamic changeIsFilteredState()
+  +dynamic expandAllMessages()
+  +dynamic collapseAllMessages()
+  +List<String> getBodyText()
+  +String getTotalMonths()
+  +String getTotalAmount()
+  -dynamic _showMessagesOnScreen()
+  -dynamic _expansionTileReRender()
+  -dynamic _emitIsLoadingState()
+  +dynamic fetchSmsMessages()
+  -dynamic _filter()
+  -dynamic _filterUsingKeyword()
+  -dynamic _filterUsingParameters()
+  -dynamic _fetchSmsMessagesFromCellphone()
+  -dynamic _checkPermissionAndFetchMessages()
+  +void onInit()
+}
+
+"sms::Presentation_layer::controllers::sms_controller.dart::SmsController" o-- "sms::Presentation_layer::controllers::sms_controller.dart::Permission"
+"sms::Presentation_layer::controllers::sms_controller.dart::SmsController" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"sms::Presentation_layer::controllers::sms_controller.dart::SmsController" o-- "flutter::src::foundation::key.dart::UniqueKey"
+"get::get_state_manager::src::simple::get_controllers.dart::GetxController" <|-- "sms::Presentation_layer::controllers::sms_controller.dart::SmsController"
+
+class "sms::Presentation_layer::controllers::sms_controller.dart::Permission" {
+  +int index
+  {static} +List<Permission> values
+  {static} +Permission granted
+  {static} +Permission denied
+}
+
+"sms::Presentation_layer::controllers::sms_controller.dart::Permission" o-- "sms::Presentation_layer::controllers::sms_controller.dart::Permission"
+"dart::core::Enum" <|-- "sms::Presentation_layer::controllers::sms_controller.dart::Permission"
+
+class "sms::Presentation_layer::controllers::splash_controller.dart::SplashController" {
+  +dynamic startNavigationTimer()
+  +dynamic route()
+  +void onInit()
+}
+
+"get::get_state_manager::src::simple::get_controllers.dart::GetxController" <|-- "sms::Presentation_layer::controllers::splash_controller.dart::SplashController"
+
+class "sms::Presentation_layer::sms_app.dart::SmsApp" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::sms_app.dart::SmsApp"
+
+class "sms::Presentation_layer::views::sms_view.dart::SmsView" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::views::sms_view.dart::SmsView"
+
+class "sms::Presentation_layer::views::splash_view.dart::SplashView" {
+  +State<SplashView> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "sms::Presentation_layer::views::splash_view.dart::SplashView"
+
+class "sms::Presentation_layer::views::splash_view.dart::_SplashViewState" {
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "sms::Presentation_layer::views::splash_view.dart::_SplashViewState"
+
+class "sms::Presentation_layer::widgets::app_bar_widget.dart::AppBarWidget" {
+  +List<Widget>? actions
+  +Size preferredSize
+  +Widget build()
+}
+
+"sms::Presentation_layer::widgets::app_bar_widget.dart::AppBarWidget" o-- "dart::ui::Size"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::widgets::app_bar_widget.dart::AppBarWidget"
+"flutter::src::widgets::preferred_size.dart::PreferredSizeWidget" <|-- "sms::Presentation_layer::widgets::app_bar_widget.dart::AppBarWidget"
+
+class "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::FilterBottomSheet" {
+  +Function? onFilter
+  +State<FilterBottomSheet> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::FilterBottomSheet"
+
+class "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::_FilterBottomSheetState" {
+  +TextEditingController sender
+  +TextEditingController amountFrom
+  +TextEditingController amountTo
+  +DateTime? dateFrom
+  +String? dateFromString
+  +String? dateToString
+  +DateTime? dateTo
+  +bool onlyTransactions
+  +dynamic getDateFrom()
+  +dynamic getDateTo()
+  -dynamic _updateDateFrom()
+  -dynamic _updateDateTo()
+  +dynamic getInitialDate()
+  +dynamic getFirstDate()
+  +dynamic getLastDate()
+  +dynamic showDatePickerWidget()
+  +Widget build()
+}
+
+"sms::Presentation_layer::widgets::filter_bottom_sheet.dart::_FilterBottomSheetState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::_FilterBottomSheetState"
+
+class "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::DatePickerType" {
+  +int index
+  {static} +List<DatePickerType> values
+  {static} +DatePickerType from
+  {static} +DatePickerType to
+}
+
+"sms::Presentation_layer::widgets::filter_bottom_sheet.dart::DatePickerType" o-- "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::DatePickerType"
+"dart::core::Enum" <|-- "sms::Presentation_layer::widgets::filter_bottom_sheet.dart::DatePickerType"
+
+class "sms::Presentation_layer::widgets::loading_indicator.dart::LoadingIndicator" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::widgets::loading_indicator.dart::LoadingIndicator"
+
+class "sms::Presentation_layer::widgets::text_field_widget.dart::TextFieldWidget" {
+  +num? height
+  +num? width
+  +Function? onChanged
+  +TextEditingController? controller
+  +String? hintText
+  +Widget? suffix
+  +Widget? prefix
+  +Widget build()
+}
+
+"sms::Presentation_layer::widgets::text_field_widget.dart::TextFieldWidget" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"sms::Presentation_layer::widgets::text_field_widget.dart::TextFieldWidget" o-- "flutter::src::widgets::framework.dart::Widget"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::widgets::text_field_widget.dart::TextFieldWidget"
+
+class "sms::Presentation_layer::widgets::version_strip.dart::VersionStripWidget" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "sms::Presentation_layer::widgets::version_strip.dart::VersionStripWidget"
+
+abstract class "sms::utils::date_time_parse.dart::DateTimeParse" {
+  {static} +dynamic parseDateTimeReturnDateString()
+  {static} +dynamic parseDateTimeReturnMonthString()
+}
+
+class "sms::utils::permission_handler.dart::PermissionHandler" {
+  {static} +Future<dynamic> handleSmsPermission()
+  {static} -dynamic _requestPermission()
+}
+
+class "sms::utils::string_utils.dart::StringUtils" {
+  {static} +List<String> split()
+  {static} +dynamic returnSplitLength()
+}
+
+@enduml
